@@ -11,17 +11,15 @@ int solve(char *input_file) {
 
   char buffer[10];
   int sum = 0, max = 0;
+
   while (fgets(buffer, 10, pFile) != NULL) {
-    printf("buffer=%s", buffer);
     if (strcmp(buffer, "\n") == 0) {
-      printf("empty line");
       if (sum > max) max = sum;
       sum = 0;
     } else {
       int calories = atoi(buffer);
       sum += calories;
     }
-    printf("sum=%d, max=%d\n", sum, max);
   }
 
   // check if the last elf is carried the most
