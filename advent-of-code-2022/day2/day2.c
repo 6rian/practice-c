@@ -4,11 +4,27 @@
 
 #define MAX_LINE_SIZE 5
 
-enum point_values {
+enum outcome_values {
   LOSE = 0,
   DRAW = 3,
   WIN = 6
 };
+
+typedef struct moves {
+  char ROCK;
+  char PAPER;
+  char SCISSORS;
+} moves;
+
+typedef struct outcomes {
+  char LOSE;
+  char DRAW;
+  char WIN;
+} possible_outcomes;
+
+const moves my_moves = {'X', 'Y', 'Z'};
+const moves their_moves = {'A', 'B', 'C'};
+const possible_outcomes outcomes = {'X', 'Y', 'Z'};
 
 FILE *open_file(char *filename) {
   FILE *pFile = fopen(filename, "r");
@@ -20,45 +36,26 @@ FILE *open_file(char *filename) {
 }
 
 int points(char play) {
-  switch (play) {
-    case 'A':
-    case 'X':
-      return 1;
-    case 'B':
-    case 'Y':
-      return 2;
-    case 'C':
-    case 'Z':
-      return 3;
-    default:
-      return 0;
-  }
+  if (play == my_moves.ROCK || play == their_moves.ROCK) return 1;
+  if (play == my_moves.PAPER || play == their_moves.PAPER) return 2;
+  if (play == my_moves.SCISSORS || play == their_moves.SCISSORS) return 3;
+  return 0;
 }
 
 bool is_draw(char my_play, char their_play) {
   return (
-    (their_play == 'A' && my_play == 'X') ||
-    (their_play == 'B' && my_play == 'Y') ||
-    (their_play == 'C' && my_play == 'Z')
+    (their_play == their_moves.ROCK && my_play == my_moves.ROCK) ||
+    (their_play == their_moves.PAPER && my_play == my_moves.PAPER) ||
+    (their_play == their_moves.SCISSORS && my_play == my_moves.SCISSORS)
   ) ? true : false;
 }
 
 bool my_win(char my_play, char their_play) {
-    switch (my_play) {
-      case 'X':
-        // rock beats scissors
-        if (their_play == 'C') return true;
-        break;
-      case 'Y':
-        // paper beats rock
-        if (their_play == 'A') return true;
-        break;
-      case 'Z':
-        // scissors beats paper
-        if (their_play == 'B') return true;
-        break;
-    }
-    return false;
+  return (
+    (my_play == my_moves.ROCK && their_play == their_moves.SCISSORS) ||
+    (my_play == my_moves.PAPER && their_play == their_moves.ROCK) ||
+    (my_play == my_moves.SCISSORS && their_play == their_moves.PAPER)
+  ) ? true : false;
 }
 
 int solve(char *input_file) {
@@ -93,21 +90,25 @@ int solve_part2(char *input_file) {
     char their_play = buffer[0];
     char desired_outcome = buffer[2];
 
-    switch (their_play) {
-      case 'A': // rock
-        if (desired_outcome == 'X') my_score += LOSE + points('Z');
-        else if (desired_outcome == 'Y') my_score += DRAW + points('X');
-        else my_score += WIN + points('Y');
-        break;
-      case 'B': // paper
-        if (desired_outcome == 'X') my_score += LOSE + points('X');
-        else if (desired_outcome == 'Y') my_score += DRAW + points('Y');
-        else my_score += WIN + points('Z');
-        break;
-      case 'C': // scissors
-        if (desired_outcome == 'X') my_score += LOSE + points('Y');
-        else if (desired_outcome == 'Y') my_score += DRAW + points('Z');
-        else my_score += WIN + points('X');
+    if (their_play == their_moves.ROCK) {
+      if (desired_outcome == outcomes.LOSE) my_score += LOSE + points(my_moves.SCISSORS);
+      else if (desired_outcome == outcomes.DRAW) my_score += DRAW + points(my_moves.ROCK);
+      else my_score += WIN + points(my_moves.PAPER);
+      continue;
+    }
+
+    if (their_play == their_moves.PAPER) {
+      if (desired_outcome == outcomes.LOSE) my_score += LOSE + points(my_moves.ROCK);
+      else if (desired_outcome == outcomes.DRAW) my_score += DRAW + points(my_moves.PAPER);
+      else my_score += WIN + points(my_moves.SCISSORS);
+      continue;
+    }
+
+    if (their_play == their_moves.SCISSORS) {
+      if (desired_outcome == outcomes.LOSE) my_score += LOSE + points(my_moves.PAPER);
+      else if (desired_outcome == outcomes.DRAW) my_score += DRAW + points(my_moves.SCISSORS);
+      else my_score += WIN + points(my_moves.ROCK);
+      continue;
     }
   }
 
