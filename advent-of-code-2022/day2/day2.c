@@ -91,23 +91,32 @@ int solve_part2(char *input_file) {
     char desired_outcome = buffer[2];
 
     if (their_play == their_moves.ROCK) {
-      if (desired_outcome == outcomes.LOSE) my_score += LOSE + points(my_moves.SCISSORS);
-      else if (desired_outcome == outcomes.DRAW) my_score += DRAW + points(my_moves.ROCK);
-      else my_score += WIN + points(my_moves.PAPER);
+      if (desired_outcome == outcomes.LOSE)
+        my_score += LOSE + points(my_moves.SCISSORS);
+      else if (desired_outcome == outcomes.DRAW)
+        my_score += DRAW + points(my_moves.ROCK);
+      else
+        my_score += WIN + points(my_moves.PAPER);
       continue;
     }
 
     if (their_play == their_moves.PAPER) {
-      if (desired_outcome == outcomes.LOSE) my_score += LOSE + points(my_moves.ROCK);
-      else if (desired_outcome == outcomes.DRAW) my_score += DRAW + points(my_moves.PAPER);
-      else my_score += WIN + points(my_moves.SCISSORS);
+      if (desired_outcome == outcomes.LOSE)
+        my_score += LOSE + points(my_moves.ROCK);
+      else if (desired_outcome == outcomes.DRAW)
+        my_score += DRAW + points(my_moves.PAPER);
+      else
+        my_score += WIN + points(my_moves.SCISSORS);
       continue;
     }
 
     if (their_play == their_moves.SCISSORS) {
-      if (desired_outcome == outcomes.LOSE) my_score += LOSE + points(my_moves.PAPER);
-      else if (desired_outcome == outcomes.DRAW) my_score += DRAW + points(my_moves.SCISSORS);
-      else my_score += WIN + points(my_moves.ROCK);
+      if (desired_outcome == outcomes.LOSE)
+        my_score += LOSE + points(my_moves.PAPER);
+      else if (desired_outcome == outcomes.DRAW)
+        my_score += DRAW + points(my_moves.SCISSORS);
+      else
+        my_score += WIN + points(my_moves.ROCK);
       continue;
     }
   }
