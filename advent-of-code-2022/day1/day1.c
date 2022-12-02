@@ -2,12 +2,17 @@
 #include <stdlib.h>
 #include <string.h>
 
-int solve(char *input_file) {
-  FILE *pFile = fopen(input_file, "r");
+FILE *open_file(char *filename) {
+  FILE *pFile = fopen(filename, "r");
   if (!pFile) {
     perror("[ERROR]");
     exit(EXIT_FAILURE);
   }
+  return pFile;
+}
+
+int solve(char *input_file) {
+  FILE *pFile = open_file(input_file);
 
   char buffer[10];
   int sum = 0, max = 0;
@@ -17,8 +22,7 @@ int solve(char *input_file) {
       if (sum > max) max = sum;
       sum = 0;
     } else {
-      int calories = atoi(buffer);
-      sum += calories;
+      sum += atoi(buffer);
     }
   }
 
@@ -34,15 +38,11 @@ int compare(const void *a, const void *b) {
 }
 
 int solve_part2(char *input_file) {
-  FILE *pFile = fopen(input_file, "r");
-  if (!pFile) {
-    perror("[ERROR]");
-    exit(EXIT_FAILURE);
-  }
+  FILE *pFile = open_file(input_file);
 
   char buffer[10];
   int sum = 0;
-  int max_sums_length = 2;
+  int max_sums_length = 10;
   int *sums = (int *)malloc(max_sums_length * sizeof(int));
   int count = 0;
 
@@ -55,8 +55,7 @@ int solve_part2(char *input_file) {
       sums[count++] = sum;
       sum = 0;
     } else {
-      int calories = atoi(buffer);
-      sum += calories;
+      sum += atoi(buffer);
     }
   }
 
