@@ -1,11 +1,16 @@
 CC      = gcc
 CFLAGS  = -g -Wall -Wextra -Wmissing-declarations -std=c99 -pedantic
 RM			= rm -f
+DAY     = day3
 
-default: day3
+default:
+		$(CC) $(CFLAGS) -o $(DAY) $(DAY).c
 
-day3: day3.c
-		$(CC) $(CFLAGS) -o day3 day3.c
+test:
+		./$(DAY) test.txt
+
+solve:
+		./$(DAY) challenge.txt
 
 clean:
-		$(RM) day3
+		$(RM) $(DAY)
