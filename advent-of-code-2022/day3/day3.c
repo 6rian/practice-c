@@ -11,24 +11,31 @@ int get_priority(char c) {
   return c - 38;
 }
 
+char find_shared_item(const char *rucksack) {
+  // split into 2 compartments
+  int length = (int)strlen(rucksack) - 1;
+  int middle = length / 2;
+  char *left = (char *)calloc(middle + 1, sizeof(char));
+  char *right = (char *)calloc(middle + 1, sizeof(char));
+  strncpy(left, rucksack, middle);
+  strncpy(right, rucksack + middle, middle);
+
+  // find which character is present in both compartments
+  size_t loc = strcspn(left, right);
+  char shared_item = left[loc];
+
+  free(left);
+  free(right);
+  return shared_item;
+}
+
 int solve(char *input_file) {
   FILE *pFile = open_file(input_file);
   int priority_sum = 0;
   char line[MAX_LINE_SIZE];
 
   while (fgets(line, MAX_LINE_SIZE, pFile) != NULL) {
-    // split into 2 compartments
-    int length = (int)strlen(line) - 1;
-    int middle = length / 2;
-    char *left = (char *)calloc(middle + 1, sizeof(char));
-    char *right = (char *)calloc(middle + 1, sizeof(char));
-    strncpy(left, line, middle);
-    strncpy(right, line + middle, middle);
-
-    // find which character is present in both compartments
-    size_t loc = strcspn(left, right);
-    char item = left[loc];
-
+    char item = find_shared_item(line);
     priority_sum += get_priority(item);
   }
 
