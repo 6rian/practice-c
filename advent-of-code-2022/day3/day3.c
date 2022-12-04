@@ -36,6 +36,15 @@ int solve(char *input_file) {
   return priority_sum;
 }
 
+char find_badge(const char *a, const char *b, const char *c) {
+  for (int i=0; i < (int)(strlen(a) - 1); i++) {
+    char candidate = a[i];
+    if (strchr(b, candidate) != NULL && strchr(c, candidate) != NULL)
+      return candidate;
+  }
+  return '\0';
+}
+
 int solve_part2(char *input_file) {
   FILE *pFile = open_file(input_file);
   int priority_sum = 0;
@@ -49,17 +58,8 @@ int solve_part2(char *input_file) {
 
     // if the group is full, find the badge
     if (count == GROUP_SIZE) {
-      for (int i=0; i < (int)(strlen(group[0]) - 1); i++) {
-        char a = group[0][i];
-        char *b = strchr(group[1], a);
-        char *c = strchr(group[2], a);
-
-        if (b != NULL && c != NULL) {
-          priority_sum += get_priority(a);
-          break;
-        }
-      }
-
+      char badge = find_badge(group[0], group[1], group[2]);
+      if (badge != '\0') priority_sum += get_priority(badge);
       // reset counter to start next group
       count = 0;
     }
