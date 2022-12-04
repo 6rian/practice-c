@@ -2,6 +2,7 @@
 #include "../aoc.h"
 
 #define MAX_LINE_SIZE 55
+#define GROUP_SIZE 3
 
 int points(char c) {
   if (c >= 97 && c <= 122) {
@@ -23,18 +24,45 @@ int solve(char *input_file) {
     char *right = (char *)calloc(middle + 1, sizeof(char));
     strncpy(left, line, middle);
     strncpy(right, line + middle, middle);
-    // printf("length=%d, middle=%d, left=%s, right=%s, line=%s", length, middle, left, right, line);
 
     // find which character is present in both compartments
     size_t loc = strcspn(left, right);
     char item = left[loc];
-    // printf("loc=%d, char=%c, left=%s, right=%s\n", (int)loc, item, left, right);
 
     priority_sum += points(item);
-    printf("loc=%d, char=%c, points=%d, left=%s, right=%s\n", (int)loc, item, points(item), left, right);
   }
 
   fclose(pFile);
+  return priority_sum;
+}
+
+int solve_part2(char *input_file) {
+  FILE *pFile = open_file(input_file);
+  int priority_sum = 0;
+  char line[MAX_LINE_SIZE];
+  char group[GROUP_SIZE][MAX_LINE_SIZE];
+  int count = 0;
+
+  while (fgets(line, MAX_LINE_SIZE, pFile) != NULL) {
+    strncpy(group[count++], line, MAX_LINE_SIZE);
+
+    if (count == GROUP_SIZE) {
+      for (int i=0; i < (int)(strlen(group[0]) - 1); i++) {
+        char a = group[0][i];
+        char *b = strchr(group[1], a);
+        char *c = strchr(group[2], a);
+
+        if (b != NULL && c != NULL) {
+          priority_sum += points(a);
+          break;
+        }
+      }
+
+      // reset counter to start next group
+      count = 0;
+    }
+  }
+
   return priority_sum;
 }
 
@@ -44,8 +72,7 @@ int main(int argc, char **argv) {
     exit(EXIT_FAILURE);
   }
 
-  int answer = solve(argv[1]);
-  printf("Part1 answer: %d\n", answer);
-
+  printf("Part1 answer: %d\n", solve(argv[1]));
+  printf("Part2 answer: %d\n", solve_part2(argv[1]));
   return EXIT_SUCCESS;
 }
