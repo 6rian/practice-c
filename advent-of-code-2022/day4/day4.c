@@ -18,14 +18,33 @@ bool in_set(uint16_t n, uint16_t min, uint16_t max) {
   return (n >= min && n <= max) ? true : false;
 }
 
-bool has_full_overlap(uint16_t* sections) {
-  short a = sections[0];
-  short b = sections[1];
-  short c = sections[2];
-  short d = sections[3];
-  if (in_set(a, c, d) && in_set(b, c, d)) return true;
-  if (in_set(c, a, b) && in_set(d, a, b)) return true;
+bool has_overlap(bool full, uint16_t* sections) {
+  uint16_t a = sections[0];
+  uint16_t b = sections[1];
+  uint16_t c = sections[2];
+  uint16_t d = sections[3];
+
+  if (full) {
+    if (
+      (in_set(a, c, d) && in_set(b, c, d)) ||
+      (in_set(c, a, b) && in_set(d, a, b))
+    ) return true;
+  } else {
+    if (
+      (in_set(a, c, d) || in_set(b, c, d)) ||
+      (in_set(c, a, b) || in_set(d, a, b))
+    ) return true;
+  }
+
   return false;
+}
+
+bool has_full_overlap(uint16_t* sections) {
+  return has_overlap(true, sections);
+}
+
+bool has_partial_overlap(uint16_t* sections) {
+  return has_overlap(false, sections);
 }
 
 void solve(
@@ -39,10 +58,15 @@ void solve(
   while (fgets(line, MAX_LINE_SIZE, pFile) != NULL) {
     uint16_t sections[4];
     parse_line(line, sections);
-    if (has_full_overlap(sections)) *full_overlap += 1;
+
+    if (has_full_overlap(sections)) {
+      *full_overlap += 1;
+      *partial_overlap += 1;
+    } else {
+      if (has_partial_overlap(sections)) *partial_overlap += 1;
+    }
   }
 
-  *partial_overlap = 1; // temporary
   fclose(pFile);
 }
 
