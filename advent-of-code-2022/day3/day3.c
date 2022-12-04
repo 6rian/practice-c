@@ -4,7 +4,7 @@
 #define MAX_LINE_SIZE 55
 #define GROUP_SIZE 3
 
-int points(char c) {
+int get_priority(char c) {
   if (c >= 97 && c <= 122) {
     return c - 96;
   }
@@ -29,7 +29,7 @@ int solve(char *input_file) {
     size_t loc = strcspn(left, right);
     char item = left[loc];
 
-    priority_sum += points(item);
+    priority_sum += get_priority(item);
   }
 
   fclose(pFile);
@@ -44,8 +44,10 @@ int solve_part2(char *input_file) {
   int count = 0;
 
   while (fgets(line, MAX_LINE_SIZE, pFile) != NULL) {
+    // add rucksack to the group
     strncpy(group[count++], line, MAX_LINE_SIZE);
 
+    // if the group is full, find the badge
     if (count == GROUP_SIZE) {
       for (int i=0; i < (int)(strlen(group[0]) - 1); i++) {
         char a = group[0][i];
@@ -53,7 +55,7 @@ int solve_part2(char *input_file) {
         char *c = strchr(group[2], a);
 
         if (b != NULL && c != NULL) {
-          priority_sum += points(a);
+          priority_sum += get_priority(a);
           break;
         }
       }
