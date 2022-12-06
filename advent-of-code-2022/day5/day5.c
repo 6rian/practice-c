@@ -168,30 +168,36 @@ void solve(char* inputFile, char* partOneTops, char* partTwoTops) {
       unsigned short iFrom;
       unsigned short iTo;
 
+      // Parse the move instructions
       sscanf(line, "%*s %hu %*s %hu %*s %hu",
         &nCrates,
         &iFrom,
         &iTo
       );
+
+      CrateStack* tempStack = create_stack();
+
       for (unsigned short i = 0; i < nCrates; i++) {
-        // Part 1: move one crate at a time
+        // Part 1
         Crate c = pop_crate(partOneStacks[iFrom - 1]);
         if (c != '\0') push_crate(c, partOneStacks[iTo - 1]);
 
-        // Part 2: move crates in bulk
-        // create temp stack
-        // pop items and push to temp
-        // reverse temp
-        // until temp is empty, pop items and push to destination
-        // free(temp)
+        c = pop_crate(partTwoStacks[iFrom - 1]);
+        if (c != '\0') push_crate(c, tempStack);
       }
+
+      // Part 2
+      while (!is_stack_empty(tempStack)) {
+        Crate c = pop_crate(tempStack);
+        push_crate(c, partTwoStacks[iTo - 1]);
+      }
+      free(tempStack);
     }
   }
 
   // Finish by getting the top crate from each stack
   get_tops_of_stacks(partOneTops, partOneStacks, numStacks);
-  // TEMP:
-  strcpy(partTwoTops, "..todo");
+  get_tops_of_stacks(partTwoTops, partTwoStacks, numStacks);
 
   destroy_all_stacks(partOneStacks, numStacks);
   destroy_all_stacks(partTwoStacks, numStacks);
