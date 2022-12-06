@@ -182,11 +182,12 @@ void solve(char* inputFile, char* partOneTops, char* partTwoTops) {
         Crate c = pop_crate(partOneStacks[iFrom - 1]);
         if (c != '\0') push_crate(c, partOneStacks[iTo - 1]);
 
+        // Part 2
         c = pop_crate(partTwoStacks[iFrom - 1]);
         if (c != '\0') push_crate(c, tempStack);
       }
 
-      // Part 2
+      // Part 2 continued
       while (!is_stack_empty(tempStack)) {
         Crate c = pop_crate(tempStack);
         push_crate(c, partTwoStacks[iTo - 1]);
@@ -199,6 +200,7 @@ void solve(char* inputFile, char* partOneTops, char* partTwoTops) {
   get_tops_of_stacks(partOneTops, partOneStacks, numStacks);
   get_tops_of_stacks(partTwoTops, partTwoStacks, numStacks);
 
+  // Cleanup
   destroy_all_stacks(partOneStacks, numStacks);
   destroy_all_stacks(partTwoStacks, numStacks);
   fclose(pFile);
@@ -210,7 +212,6 @@ int main(int argc, char** argv) {
     exit(EXIT_FAILURE);
   }
 
-  // char* part1 = solve(argv[1]);
   char* part1 = (char*)malloc((MAX_STACKS + 1) * sizeof(char));
   char* part2 = (char*)malloc((MAX_STACKS + 1) * sizeof(char));
   solve(argv[1], part1, part2);
