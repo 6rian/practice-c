@@ -131,9 +131,10 @@ void solve(char* inputFile, char* part1) {
         stacks = init_all_stacks(numStacks);
       }
 
+      // Every 4th item that isn't a space is a crate, to be added to
+      // its respective stack
       for (int i=1, j=0; i < (int)strlen(line); i+=4, j++) {
-        if (!isspace(line[i]))
-          push_crate(line[i], stacks[j]);
+        if (!isspace(line[i])) push_crate(line[i], stacks[j]);
       }
     }
     
@@ -152,11 +153,14 @@ void solve(char* inputFile, char* part1) {
       unsigned short iFrom;
       unsigned short iTo;
 
-      sscanf(line, "%*s %hu %*s %hu %*s %hu", &nCrates, &iFrom, &iTo);
+      sscanf(line, "%*s %hu %*s %hu %*s %hu",
+        &nCrates,
+        &iFrom,
+        &iTo
+      );
       for (unsigned short i = 0; i < nCrates; i++) {
-        Crate c = pop_crate(stacks[iFrom-1]);
-        if (c != '\0')
-          push_crate(c, stacks[iTo-1]);
+        Crate c = pop_crate(stacks[iFrom - 1]);
+        if (c != '\0') push_crate(c, stacks[iTo - 1]);
       }
     }
   }
