@@ -117,35 +117,38 @@ bool is_move_instruction(char* line) {
   return (strncmp(line, "move", 4) == 0) ? true : false;
 }
 
-char* get_tops_of_stacks(CrateStack** stacks, int numStacks) {
-  char* tops = (char*)malloc((numStacks + 1) * sizeof(char));
+void get_tops_of_stacks(char* dest, CrateStack** stacks, int numStacks) {
   for (int i = 0; i < numStacks; i++) {
     char* c = (char*)malloc(2 * sizeof(char));
     sprintf(c, "%c", stacks[i]->crates[stacks[i]->top]);
-    strncat(tops, c, 1);
+    strncat(dest, c, 1);
     free(c);
   }
-  return tops;
 }
 
-char* solve(char* inputFile) {
+void solve(char* inputFile, char* partOneTops, char* partTwoTops) {
   FILE* pFile = open_file(inputFile);
   char line[MAX_LINE_SIZE];
   short numStacks = 0;
   bool stacksReady = false;
-  CrateStack** stacks;
+  CrateStack** partOneStacks;
+  CrateStack** partTwoStacks;
 
   while (fgets(line, MAX_LINE_SIZE, pFile) != NULL) {
     if (is_stack_construction(line)) {
       if (!numStacks) {
         numStacks = (strlen(line) / 4);
-        stacks = init_all_stacks(numStacks);
+        partOneStacks = init_all_stacks(numStacks);
+        partTwoStacks = init_all_stacks(numStacks);
       }
 
       // Every 4th item that isn't a space is a crate, to be added to
       // its respective stack
       for (int i=1, j=0; i < (int)strlen(line); i+=4, j++) {
-        if (!isspace(line[i])) push_crate(line[i], stacks[j]);
+        if (!isspace(line[i])) {
+          push_crate(line[i], partOneStacks[j]);
+          push_crate(line[i], partTwoStacks[j]);
+        }
       }
     }
     
@@ -155,7 +158,8 @@ char* solve(char* inputFile) {
       // than bottom up.
       if (!stacksReady) {
         for (int i = 0; i < numStacks; i++) {
-          reverse_crates(stacks[i]);
+          reverse_crates(partOneStacks[i]);
+          reverse_crates(partTwoStacks[i]);
         }
         stacksReady = true;
       }
@@ -170,18 +174,28 @@ char* solve(char* inputFile) {
         &iTo
       );
       for (unsigned short i = 0; i < nCrates; i++) {
-        Crate c = pop_crate(stacks[iFrom - 1]);
-        if (c != '\0') push_crate(c, stacks[iTo - 1]);
+        // Part 1: move one crate at a time
+        Crate c = pop_crate(partOneStacks[iFrom - 1]);
+        if (c != '\0') push_crate(c, partOneStacks[iTo - 1]);
+
+        // Part 2: move crates in bulk
+        // create temp stack
+        // pop items and push to temp
+        // reverse temp
+        // until temp is empty, pop items and push to destination
+        // free(temp)
       }
     }
   }
 
   // Finish by getting the top crate from each stack
-  char* answer = get_tops_of_stacks(stacks, numStacks);
+  get_tops_of_stacks(partOneTops, partOneStacks, numStacks);
+  // TEMP:
+  strcpy(partTwoTops, "..todo");
 
-  destroy_all_stacks(stacks, numStacks);
+  destroy_all_stacks(partOneStacks, numStacks);
+  destroy_all_stacks(partTwoStacks, numStacks);
   fclose(pFile);
-  return answer;
 }
 
 int main(int argc, char** argv) {
@@ -190,8 +204,13 @@ int main(int argc, char** argv) {
     exit(EXIT_FAILURE);
   }
 
-  char* part1 = solve(argv[1]);
+  // char* part1 = solve(argv[1]);
+  char* part1 = (char*)malloc((MAX_STACKS + 1) * sizeof(char));
+  char* part2 = (char*)malloc((MAX_STACKS + 1) * sizeof(char));
+  solve(argv[1], part1, part2);
+
   printf("Part1 answer: %s\n", part1);
+  printf("Part2 answer: %s\n", part2);
 
   return EXIT_SUCCESS;
 }
