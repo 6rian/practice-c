@@ -117,7 +117,18 @@ bool is_move_instruction(char* line) {
   return (strncmp(line, "move", 4) == 0) ? true : false;
 }
 
-void solve(char* inputFile, char* part1) {
+char* get_tops_of_stacks(CrateStack** stacks, int numStacks) {
+  char* tops = (char*)malloc((numStacks + 1) * sizeof(char));
+  for (int i = 0; i < numStacks; i++) {
+    char* c = (char*)malloc(2 * sizeof(char));
+    sprintf(c, "%c", stacks[i]->crates[stacks[i]->top]);
+    strncat(tops, c, 1);
+    free(c);
+  }
+  return tops;
+}
+
+char* solve(char* inputFile) {
   FILE* pFile = open_file(inputFile);
   char line[MAX_LINE_SIZE];
   short numStacks = 0;
@@ -166,15 +177,11 @@ void solve(char* inputFile, char* part1) {
   }
 
   // Finish by getting the top crate from each stack
-  for (int i = 0; i < numStacks; i++) {
-    char* c = (char*)malloc(2 * sizeof(char));
-    sprintf(c, "%c", pop_crate(stacks[i]));
-    strncat(part1, c, 1);
-    free(c);
-  }
+  char* answer = get_tops_of_stacks(stacks, numStacks);
 
   destroy_all_stacks(stacks, numStacks);
   fclose(pFile);
+  return answer;
 }
 
 int main(int argc, char** argv) {
@@ -183,11 +190,8 @@ int main(int argc, char** argv) {
     exit(EXIT_FAILURE);
   }
 
-  char* part1;
-  part1 = (char*)malloc((MAX_STACKS + 1) * sizeof(char));
-  solve(argv[1], part1);
+  char* part1 = solve(argv[1]);
   printf("Part1 answer: %s\n", part1);
 
-  free(part1);  
   return EXIT_SUCCESS;
 }
