@@ -1,6 +1,7 @@
 #include "../aoc.h"
 
 #define MAX_LINE_SIZE 40
+#define MAX_STACKS 9
 #define INITIAL_CRATE_STACK_SIZE 10
 
 typedef char Crate;
@@ -64,7 +65,7 @@ void print_stack(CrateStack* s) {
     puts("Stack is empty");
     return;
   }
-  for (int i=0; i <= s->top; i++) {
+  for (int i = 0; i <= s->top; i++) {
     printf("[%c] ", s->crates[i]);
   }
   printf("\n");
@@ -86,6 +87,13 @@ CrateStack** init_all_stacks(int n) {
   return stacks;
 }
 
+void destroy_all_stacks(CrateStack** stacks, int length) {
+  for (int i = 0; i < length; i++) {
+    free(stacks[i]->crates);
+    free(stacks[i]);
+  }
+}
+
 void reverse_crates(CrateStack* s) {
   if (is_stack_empty(s)) return;
   int left = 0;
@@ -99,6 +107,16 @@ void reverse_crates(CrateStack* s) {
   }
 }
 
+bool is_stack_construction(char* line) {
+  // Lines with [] are for constructing the crate stacks.
+  return (strchr(line, '[') != NULL) ? true : false;
+}
+
+bool is_move_instruction(char* line) {
+  // Lines that begin with "move" are the instructions to follow.
+  return (strncmp(line, "move", 4) == 0) ? true : false;
+}
+
 void solve(char* inputFile, char* part1) {
   FILE* pFile = open_file(inputFile);
   char line[MAX_LINE_SIZE];
@@ -107,26 +125,19 @@ void solve(char* inputFile, char* part1) {
   CrateStack** stacks;
 
   while (fgets(line, MAX_LINE_SIZE, pFile) != NULL) {
-    // Lines with [] are for constructing the crate stacks.
-    if (strchr(line, '[') != NULL) {
+    if (is_stack_construction(line)) {
       if (!numStacks) {
         numStacks = (strlen(line) / 4);
         stacks = init_all_stacks(numStacks);
       }
 
-      // starting at [1], check every 4th item to get the contents
-      printf("%s", line);
-      size_t len = strlen(line);
-      for (int i=1, j=0; i < (int)len; i+=4, j++) {
-        // printf("Pushing c=%c to stack#%d,%d\n", line[i], i, j);
+      for (int i=1, j=0; i < (int)strlen(line); i+=4, j++) {
         if (!isspace(line[i]))
           push_crate(line[i], stacks[j]);
       }
-      printf("\n");
     }
-
-    // Lines that begin with "move" are the instructions to follow.
-    if (strncmp(line, "move", 4) == 0) {
+    
+    if (is_move_instruction(line)) {
       // Stacks need to be reversed before the move instructions can
       // be executed since they were built from the top down rather
       // than bottom up.
@@ -142,7 +153,6 @@ void solve(char* inputFile, char* part1) {
       unsigned short iTo;
 
       sscanf(line, "%*s %hu %*s %hu %*s %hu", &nCrates, &iFrom, &iTo);
-      // printf("m %hu f %hu t %hu\n", nCrates, iFrom, iTo);
       for (unsigned short i = 0; i < nCrates; i++) {
         Crate c = pop_crate(stacks[iFrom-1]);
         if (c != '\0')
@@ -151,11 +161,15 @@ void solve(char* inputFile, char* part1) {
     }
   }
 
-  // temporary:
-  strcpy(part1, "abc");
-  print_all_stacks(stacks, numStacks);
+  // Finish by getting the top crate from each stack
+  for (int i = 0; i < numStacks; i++) {
+    char* c = (char*)malloc(2 * sizeof(char));
+    sprintf(c, "%c", pop_crate(stacks[i]));
+    strncat(part1, c, 1);
+    free(c);
+  }
 
-  free(stacks);
+  destroy_all_stacks(stacks, numStacks);
   fclose(pFile);
 }
 
@@ -166,13 +180,10 @@ int main(int argc, char** argv) {
   }
 
   char* part1;
-  part1 = (char*)malloc(5 * sizeof(char));
+  part1 = (char*)malloc((MAX_STACKS + 1) * sizeof(char));
   solve(argv[1], part1);
-
   printf("Part1 answer: %s\n", part1);
-  // printf("Part2 answer: %d\n", part_2);
 
-  free(part1);
-  
+  free(part1);  
   return EXIT_SUCCESS;
 }
